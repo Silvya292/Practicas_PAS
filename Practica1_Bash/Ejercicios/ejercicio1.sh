@@ -13,7 +13,26 @@ then
     echo "ERROR, número de argumentos incorrecto."
 elif [ -d $1 ]
 then
-    echo "El directorio ya existe."
+    echo "El directorio ya existe. ¿Desea eliminarlo? (s/n)"
+    read response
+    if [ $response == "s" ]
+    then
+        rm -r $1
+        echo "Directorio eliminado."
+        echo "Creando nuevo directorio..."
+        mkdir $1
+        for i in $(seq $2)
+        do
+            subName="$(getRandomName "$3")"
+            mkdir $1/$subName
+            for i in .sh .html .key .txt
+            do
+                fileName="$(getRandomName "$3")"
+                touch $1/$subName/$fileName$i
+            done
+        done
+        echo "Nuevo directorio creado"
+    fi
 else
     mkdir $1
     for i in $(seq $2)
@@ -26,5 +45,5 @@ else
             touch $1/$subName/$fileName$i
         done
     done
-    echo "Hecho"
+    echo "Directorio creado correctamente"
 fi
