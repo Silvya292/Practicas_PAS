@@ -9,18 +9,19 @@
 #directorio skel. Si se intenta crear un usuario que ya existe, no deberá volver a crearlo.
 #Una vez creada dicha función, el script deberá llamarla utilizando como nombre el primer argumento con el que se invoque el script.
 
-function crear_usuario() {
-    while IFS= read -r user
+function crear_usuario() { #Función para crear usuarios
+    while IFS= read -r user #Variable de entorno que determina la separación entre los campos internos, en este caso con un =
+                            #Mientras haya usuarios los lee
     do
-        if [[ "$user" == $1 ]]
+        if [[ "$user" == $1 ]] #Si el usuario ya existe sale
         then
             echo "El usuario indicado ya existe en el sistema"
             exit
         fi
-    done < users.txt
-    echo "$1" >> users.txt
-    mkdir homes/$1
-    cp skel/* homes/$1
+    done < users.txt #Esto lo hace en el fichero users.txt
+    echo "$1" >> users.txt #Imprime sin sobreescribir en el fichero users.txt si no existe
+    mkdir homes/$1 #Crea una carpeta con el nombre del usuario en el directorio homes
+    cp skel/* homes/$1 #Copia todo lo del directorio skel en la carpeta creada
     echo "Se ha creado el usuario $1"
 }
 
@@ -28,5 +29,5 @@ if [ $# != 1 ]
 then
     echo "ERROR, número de argumentos incorrecto."
 else
-    crear_usuario "$1"
+    crear_usuario "$1" #Se llama a la función con la primera variable insertada por línea de comandos
 fi
