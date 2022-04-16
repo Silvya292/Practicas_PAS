@@ -9,9 +9,9 @@ then
 elif [ -d $1 ] #Comprobar si es un directorio
 then
     nMin=$(($2 * 60)) #Se calcula el nº de minutos multiplicando las horas insertadas
-    for i in $(ls $1) #Se lista el directorio
+    for i in $(find $1 -type f -mmin -$nMin) #Imprime los fichero que hayan sido modificados en los últimos nMin
     do
-        echo "$(find $1$i -type f -mmin -$nMin)" #Imprime los fichero que hayan sido modificados en los últimos nMin
+        echo "$($i)"
     done
 else
     echo "El directorio insertado no existe"
