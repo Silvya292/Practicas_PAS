@@ -56,7 +56,34 @@ char WriteBuffer[MAX_SIZE];
 char serverQueue[100];
 char clientQueue[100];
 
-void stopFunction(int signal){
+void manejadorSIGINT(int signal){
+    sprintf(WriteBuffer, "Capturada la señal con identificador: %d", signal);
+	funcionLog(WriteBuffer);
+	sprintf(WriteBuffer, "exit\n");
+
+    if (mq_send(mq_server, WriteBuffer, MAX_SIZE, 0) != 0) {
+        perror("Error al enviar el mensaje");
+        funcionLog("Error al enviar el mensaje");
+        exit(-1);
+    }
+    funcionLog(WriteBuffer);
+    printf("\n");
+
+    // Cerrar la cola del servidor y del cliente
+    if(mq_close(mq_server) == (mqd_t)-1) {
+        perror("Error al cerrar la cola del servidor");
+        funcionLog("Error al cerrar la cola del servidor");
+        exit(-1);
+    }
+    if(mq_close(mq_client) == (mqd_t)-1) {
+        perror("Error al cerrar la cola del cliente");
+        funcionLog("Error al cerrar la cola del cliente");
+        exit(-1);
+    }
+    exit(0);
+}
+
+void manejadorSIGTERM(int signal){
     sprintf(WriteBuffer, "Capturada la señal con identificador: %d", signal);
 	funcionLog(WriteBuffer);
 	sprintf(WriteBuffer, "exit\n");
@@ -84,12 +111,12 @@ void stopFunction(int signal){
 }
 
 int main(int argc, char **argv) {
-    if(signal(SIGINT, stopFunction)==SIG_ERR){
+    if(signal(SIGINT, manejadorSIGINT)==SIG_ERR){
         printf("No puedo asociar la señal SIGINT al manejador!\n");
         funcionLog("No puedo asociar la señal SIGINT al manejador!\n");
     }
 
-    if(signal(SIGTERM, stopFunction)==SIG_ERR){
+    if(signal(SIGTERM, manejadorSIGTERM)==SIG_ERR){
         printf("No puedo asociar la señal SIGTERM al manejador!\n");
         funcionLog("No puedo asociar la señal SIGTERM al manejador!\n");
     }
@@ -118,6 +145,7 @@ int main(int argc, char **argv) {
     printf("[Cliente]: El descriptor de la cola del cliente es: %d\n", (int)mq_client);
 
     printf("\nMandando mensajes al servidor (escribir \"%s\" para parar):\n", MSG_STOP);
+   
     do {
         printf("→ ");
 
@@ -149,7 +177,7 @@ int main(int argc, char **argv) {
             exit(-1);
         }
         printf("%s\n",ReadBuffer);
-
+        printf("%s\n",WriteBuffer);
     // Iterar hasta escribir el código de salida
     } while(strcmp(WriteBuffer, MSG_STOP));
 

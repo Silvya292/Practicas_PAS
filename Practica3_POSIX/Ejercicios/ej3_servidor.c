@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
         if(strncmp(ReadBuffer, MSG_STOP, strlen(MSG_STOP)) == 0){
             must_stop = 1;
         }
-        else{
+        
             printf("Recibido el mensaje: %s", ReadBuffer);
 
             sprintf(WriteBuffer,"Número de caracteres leídos: %ld",(strlen(ReadBuffer)-1));
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
                 exit(-1);
             }
             funcionLog(WriteBuffer);
-        }
+        
     } while (!must_stop); // Iterar hasta que llegue el código de salida, es decir, la palabra exit
     funcionLog("exit");
 
