@@ -57,6 +57,7 @@ char serverQueue[100];
 char clientQueue[100];
 
 void manejadorSIGINT(int signal){
+    printf(" Capturé la señal SIGINT, saliendo...");
     sprintf(WriteBuffer, "Capturada la señal con identificador: %d", signal);
 	funcionLog(WriteBuffer);
 	sprintf(WriteBuffer, "exit\n");
@@ -84,6 +85,7 @@ void manejadorSIGINT(int signal){
 }
 
 void manejadorSIGTERM(int signal){
+    printf("Capturé la señal SIGTERM, saliendo...");
     sprintf(WriteBuffer, "Capturada la señal con identificador: %d", signal);
 	funcionLog(WriteBuffer);
 	sprintf(WriteBuffer, "exit\n");
@@ -177,7 +179,7 @@ int main(int argc, char **argv) {
             exit(-1);
         }
         printf("%s\n",ReadBuffer);
-        printf("%s\n",WriteBuffer);
+        //printf("%s\n",WriteBuffer);
     // Iterar hasta escribir el código de salida
     } while(strcmp(WriteBuffer, MSG_STOP));
 

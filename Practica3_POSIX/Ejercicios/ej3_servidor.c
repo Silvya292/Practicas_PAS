@@ -70,26 +70,29 @@ int main(int argc, char **argv) {
     // Nombre para la cola. Al concatenar el login sera unica en un sistema compartido.
     sprintf(serverQueue, "%s-%s", SERVER_QUEUE, getenv("USER"));
     printf("[Servidor]: El nombre de la cola del servidor es: %s\n", serverQueue);
-    sprintf(clientQueue, "%s-%s", CLIENT_QUEUE, getenv("USER"));
-    printf("[Servidor]: El nombre de la cola del cliente es: %s\n", clientQueue);
 
     // Crear la cola de mensajes del servidor
     mq_server = mq_open(serverQueue, O_CREAT | O_RDONLY, 0644, &attr);
-    mq_client = mq_open(clientQueue, O_CREAT | O_WRONLY, 0644, &attr);
 
     if (mq_server == (mqd_t)-1){
         perror("Error al abrir la cola del servidor");
         funcionLog("Error al abrir la cola del servidor");
         exit(-1);
     }
-    printf("[Servidor]: El descriptor de la cola del servidor es: %d\n", (int)mq_server);
+    printf("[Servidor]: El descriptor de la cola del servidor es: %d\n\n", (int)mq_server);
+
+    // Crear la cola de mensajes del cliente
+    sprintf(clientQueue, "%s-%s", CLIENT_QUEUE, getenv("USER"));
+    printf("[Servidor]: El nombre de la cola del cliente es: %s\n", clientQueue);
+
+    mq_client = mq_open(clientQueue, O_CREAT | O_WRONLY, 0644, &attr);
 
     if (mq_client == (mqd_t)-1){
         perror("Error al abrir la cola del cliente");
         funcionLog("Error al abrir la cola del cliente");
         exit(-1);
     }
-    printf("[Servidor]: El descriptor de la cola del cliente es: %d\n", (int)mq_client);
+    printf("[Servidor]: El descriptor de la cola del cliente es: %d\n\n", (int)mq_client);
 
     do{
         // Número de bytes leidos
@@ -110,15 +113,14 @@ int main(int argc, char **argv) {
             must_stop = 1;
         }
         
-            printf("Recibido el mensaje: %s", ReadBuffer);
-
-            sprintf(WriteBuffer,"Número de caracteres leídos: %ld",(strlen(ReadBuffer)-1));
-            if (mq_send(mq_client, WriteBuffer, MAX_SIZE, 0) != 0) {
-                perror("Error al enviar el mensaje");
-                funcionLog("Error al enviar el mensaje");
-                exit(-1);
-            }
-            funcionLog(WriteBuffer);
+        printf("Recibido el mensaje: %s", ReadBuffer);
+        sprintf(WriteBuffer,"Número de caracteres leídos: %ld",(strlen(ReadBuffer)-1));
+        if (mq_send(mq_client, WriteBuffer, MAX_SIZE, 0) != 0) {
+            perror("Error al enviar el mensaje");
+            funcionLog("Error al enviar el mensaje");
+            exit(-1);
+        }
+        funcionLog(WriteBuffer);
         
     } while (!must_stop); // Iterar hasta que llegue el código de salida, es decir, la palabra exit
     funcionLog("exit");
